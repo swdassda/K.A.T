@@ -1,50 +1,37 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Kathy AI</title>
 
 <link rel="stylesheet" href="style.css">
-
 </head>
 <body>
 
-<div class="chat-container">
-
-    <div class="topbar">
-        <h2>Kathy AI</h2>
-    </div>
+<div id="app">
 
     <div id="chat"></div>
 
-    <div class="input-area">
+    <div id="typing" hidden>
+        Kathy está digitando...
+    </div>
+
+    <div id="input-area">
+
+        <label class="circle-btn">
+            +
+            <input type="file" id="imageInput" hidden>
+        </label>
 
         <input
-            type="file"
-            id="imagem"
-            accept="image/*"
-            hidden
+            type="text"
+            id="message"
+            placeholder="Mensagem..."
         >
 
-        <button onclick="selecionarImagem()">
-            📷
-        </button>
-
-        <button
-            id="btnInternet"
-            onclick="toggleInternet()"
-        >
-            🌐
-        </button>
-
-        <input
-            id="mensagem"
-            placeholder="Digite uma mensagem..."
-        >
-
-        <button onclick="enviarMensagem()">
+        <button id="send">
             ➜
         </button>
 
@@ -53,6 +40,5 @@
 </div>
 
 <script src="script.js"></script>
-
 </body>
 </html>
