@@ -1,36 +1,12 @@
-const URL = "https://SEU-NGROK.ngrok-free.app/ia";
+const chat = document.getElementById("chat");
+const sendBtn = document.getElementById("send");
+const messageInput = document.getElementById("message");
+const imageInput = document.getElementById("imageInput");
+const typing = document.getElementById("typing");
 
 let imagemBase64 = null;
-let usarInternet = false;
 
-function toggleInternet(){
-
-    usarInternet = !usarInternet;
-
-    const btn = document.getElementById("btnInternet");
-
-    if(usarInternet){
-
-        btn.style.background = "white";
-        btn.style.color = "black";
-
-    }else{
-
-        btn.style.background = "#111";
-        btn.style.color = "white";
-    }
-}
-
-function selecionarImagem(){
-
-    document
-    .getElementById("imagem")
-    .click();
-}
-
-document
-.getElementById("imagem")
-.addEventListener("change", function(e){
+imageInput.addEventListener("change", e => {
 
     const file = e.target.files[0];
 
@@ -38,10 +14,9 @@ document
 
     const reader = new FileReader();
 
-    reader.onload = function(){
+    reader.onload = () => {
 
-        imagemBase64 =
-            reader.result.split(",")[1];
+        imagemBase64 = reader.result.split(",")[1];
 
         criarBolha(
             "📷 Imagem anexada",
@@ -52,107 +27,86 @@ document
     reader.readAsDataURL(file);
 });
 
-function criarBolha(texto,tipo){
+function criarBolha(texto, tipo){
 
-    const chat =
-        document.getElementById("chat");
+    const div = document.createElement("div");
 
-    const div =
-        document.createElement("div");
-
-    div.className =
-        "bolha " + tipo;
+    div.className = `bubble ${tipo}`;
 
     div.textContent = texto;
 
     chat.appendChild(div);
 
-    chat.scrollTop =
-        chat.scrollHeight;
+    scrollFinal();
 
     return div;
 }
 
-async function enviarMensagem(){
+function scrollFinal(){
 
-    const input =
-        document.getElementById("mensagem");
+    chat.scrollTop = chat.scrollHeight;
+}
 
-    const mensagem =
-        input.value.trim();
+async function enviar(){
 
-    if(!mensagem && !imagemBase64)
+    const msg = messageInput.value.trim();
+
+    if(!msg && !imagemBase64)
         return;
 
-    criarBolha(mensagem,"user");
+    criarBolha(msg || "[imagem]", "user");
 
-    input.value = "";
+    messageInput.value = "";
 
-    const bolhaBot =
-        criarBolha("...", "bot");
+    typing.hidden = false;
 
-    try{
+    const resposta = criarBolha("", "bot");
 
-        const response =
-            await fetch(URL,{
-
+    const response = await fetch(
+        "https://SEU-NGROK.ngrok-free.app/ia",
+        {
             method:"POST",
-
             headers:{
-                "Content-Type":
-                "application/json"
+                "Content-Type":"application/json"
             },
-
             body:JSON.stringify({
-
-                message:mensagem,
+                message:msg,
                 image:imagemBase64,
-                internet:usarInternet,
+                internet:true,
                 player:"player1"
-
             })
-
-        });
-
-        const reader =
-            response.body.getReader();
-
-        const decoder =
-            new TextDecoder();
-
-        bolhaBot.textContent = "";
-
-        while(true){
-
-            const {done,value} =
-                await reader.read();
-
-            if(done) break;
-
-            bolhaBot.textContent +=
-                decoder.decode(value);
-
-            document
-            .getElementById("chat")
-            .scrollTop =
-            document
-            .getElementById("chat")
-            .scrollHeight;
         }
+    );
 
-    }catch(err){
+    typing.hidden = true;
 
-        bolhaBot.textContent =
-            "Erro: " + err;
+    const reader = response.body.getReader();
+
+    const decoder = new TextDecoder();
+
+    while(true){
+
+        const {done,value} =
+            await reader.read();
+
+        if(done)
+            break;
+
+        resposta.textContent +=
+            decoder.decode(value);
+
+        scrollFinal();
     }
 
     imagemBase64 = null;
 }
 
-document
-.getElementById("mensagem")
-.addEventListener("keydown",e=>{
+sendBtn.addEventListener("click", enviar);
 
-    if(e.key==="Enter")
-        enviarMensagem();
-});
+messageInput.addEventListener(
+    "keypress",
+    e=>{
+        if(e.key==="Enter")
+            enviar();
+    }
+);
