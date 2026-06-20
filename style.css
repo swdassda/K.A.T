@@ -8,13 +8,14 @@ body{
     background:#050505;
     color:white;
     font-family:Segoe UI;
-    height:100vh;
-    overflow:hidden;
+    min-height:100dvh;
+    overflow-y:auto;
+    overflow-x:hidden;
 }
 
 #app{
     display:flex;
-    height:100vh;
+    min-height:100dvh;
 }
 
 #sidebar{
@@ -98,9 +99,10 @@ body{
 
 #main{
     flex:1;
-
     display:flex;
     flex-direction:column;
+    min-width:0;
+    min-height:0;
 }
 
 #chatHeader{
@@ -122,6 +124,8 @@ body{
     flex:1;
 
     overflow-y:auto;
+
+    min-height:0;
 
     padding:25px;
 
@@ -216,11 +220,10 @@ body{
 }
 
 #input-area{
-
     padding:20px;
-
     display:flex;
     gap:10px;
+    flex-shrink:0;
 }
 
 #message{
