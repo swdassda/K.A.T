@@ -19,6 +19,7 @@ const API_URL =
 let chats = {};
 let chatAtual = null;
 let imagemBase64 = null;
+let gerandoResposta = false;
 
 /* =========================
    USUÁRIO
@@ -161,6 +162,14 @@ function criarItemChat(id){
         "click",
         (e)=>{
 
+
+            if(gerandoResposta){
+                alert(
+                    "Aguarde a resposta terminar."
+                );
+                return;
+            }
+
             e.stopPropagation();
 
             const confirmar =
@@ -206,6 +215,12 @@ function criarItemChat(id){
     item.addEventListener(
         "click",
         ()=>{
+            if(gerandoResposta){
+                alert(
+                    "Aguarde a resposta terminar."
+                );
+                return;
+            }
 
             abrirChat(id);
 
@@ -215,6 +230,10 @@ function criarItemChat(id){
     item.addEventListener(
         "dblclick",
         ()=>{
+
+            if(gerandoResposta){
+                return;
+            }
 
             const novoNome =
             prompt(
@@ -365,7 +384,11 @@ imageInput.addEventListener(
 
 async function enviar(){
 
-    const chatIdEnvio = chatAtual;
+    if(gerandoResposta){
+        return;
+    }
+
+
 
     const msg =
     messageInput.value.trim();
@@ -376,6 +399,10 @@ async function enviar(){
     ){
         return;
     }
+
+    gerandoResposta = true;
+
+    const chatIdEnvio = chatAtual;
 
     criarBolha(
         msg || "[imagem]",
@@ -515,7 +542,6 @@ async function enviar(){
         });
 
         salvar();
-
     }
     catch(error){
 
@@ -532,8 +558,10 @@ async function enviar(){
 
 
     }
-
-    imagemBase64 = null;
+    finally{
+        imagemBase64 = null;
+        gerandoResposta = false;
+    }
 }
 
 /* =========================
@@ -562,7 +590,18 @@ messageInput.addEventListener(
 
 newChatBtn.addEventListener(
     "click",
-    novaConversa
+    ()=>{
+
+        if(gerandoResposta){
+            alert(
+                "Aguarde a resposta terminar."
+            );
+            return;
+        }
+
+        novaConversa();
+
+    }
 );
 
 /* =========================
