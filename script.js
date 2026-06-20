@@ -419,7 +419,11 @@ async function enviar(){
 
                     internet:true,
 
-                    player:"player1"
+                    player:"player1",
+                   
+                    chat_id:chatAtual
+
+                   
 
                 })
             }
