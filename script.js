@@ -63,7 +63,7 @@ async function enviar(){
     const resposta = criarBolha("", "bot");
 
     const response = await fetch(
-        "https://SEU-NGROK.ngrok-free.app/ia",
+        "https://3c7e-2804-2484-991b-3400-8bdc-cb27-2b5f-a1e3.ngrok-free.app/ia",
         {
             method:"POST",
             headers:{
