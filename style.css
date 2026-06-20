@@ -166,6 +166,40 @@ body{
     animation:pulse 1s infinite;
 }
 
+
+.chat-item{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.delete-chat{
+
+    background:none;
+    border:none;
+
+    color:#888;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+    opacity:0;
+
+    transition:0.2s;
+}
+
+.chat-item:hover .delete-chat{
+
+    opacity:1;
+}
+
+.delete-chat:hover{
+
+    color:#ff4d4d;
+}
+
 @keyframes pulse{
 
     0%{
