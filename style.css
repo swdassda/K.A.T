@@ -125,7 +125,7 @@ body{
 /* HEADER */
 
 #chatHeader{
-    height:70px;
+    height:60px;
     flex-shrink:0;
 
     border-bottom:1px solid #161616;
@@ -133,9 +133,9 @@ body{
     display:flex;
     align-items:center;
 
-    padding-left:25px;
+    padding-left:20px;
 
-    font-size:20px;
+    font-size:18px;
 }
 
 /* CHAT AREA */
@@ -147,23 +147,27 @@ body{
     overflow-y:auto;
     overflow-x:hidden;
 
-    padding:25px;
+    padding:15px;
 
     display:flex;
     flex-direction:column;
-    gap:15px;
+    gap:8px;
 }
 
 /* BUBBLES */
 
 .bubble{
-    max-width:75%;
-    padding:18px;
+    max-width:85%;
 
-    border-radius:24px;
+    padding:12px 14px;
+
+    border-radius:18px;
 
     white-space:pre-wrap;
     overflow-wrap:anywhere;
+
+    line-height:1.45;
+    font-size:15px;
 }
 
 .user{
@@ -200,8 +204,8 @@ body{
 #input-area{
     flex-shrink:0;
 
-    padding:15px;
-    gap:10px;
+    padding:10px;
+    gap:8px;
 
     display:flex;
 
@@ -218,17 +222,17 @@ body{
     border:none;
     outline:none;
 
-    padding:15px;
-    border-radius:18px;
+    padding:12px 15px;
+    border-radius:16px;
 }
 
 .circle-btn,
 #send{
-    width:55px;
-    height:55px;
+    width:48px;
+    height:48px;
 
     border:none;
-    border-radius:18px;
+    border-radius:16px;
 
     background:#161616;
     color:white;
@@ -243,7 +247,7 @@ body{
 #userCard{
     border-top:1px solid #181818;
 
-    padding:20px;
+    padding:16px;
 
     display:flex;
     justify-content:space-between;
@@ -269,7 +273,41 @@ body{
         width:220px;
     }
 
+    #chatHeader{
+        height:50px;
+        font-size:16px;
+        padding-left:15px;
+    }
+
+    #chat{
+        padding:10px;
+        gap:6px;
+    }
+
     .bubble{
-        max-width:90%;
+        max-width:95%;
+        padding:10px 12px;
+        font-size:14px;
+        border-radius:16px;
+    }
+
+    #input-area{
+        padding:8px;
+        gap:6px;
+    }
+
+    #message{
+        padding:10px 12px;
+    }
+
+    .circle-btn,
+    #send{
+        width:44px;
+        height:44px;
+        border-radius:14px;
+    }
+
+    #userCard{
+        padding:12px;
     }
 }
