@@ -136,22 +136,65 @@ function criarItemChat(id){
     const item =
     document.createElement("div");
 
-    item.className =
-    "chat-item";
+    item.className = "chat-item";
+    item.dataset.id = id;
 
-    item.dataset.id =
-    id;
+    const nome =
+    document.createElement("span");
 
-    item.textContent =
+    nome.textContent =
     chats[id].nome;
+
+    const removeBtn =
+    document.createElement("button");
+
+    removeBtn.className =
+    "delete-chat";
+
+    removeBtn.textContent =
+    "🗑";
+
+    removeBtn.addEventListener(
+        "click",
+        (e)=>{
+
+            e.stopPropagation();
+
+            if(
+                !confirm(
+                    "Remover esta conversa?"
+                )
+            ){
+                return;
+            }
+
+            delete chats[id];
+
+            item.remove();
+
+            salvar();
+
+            const ids =
+            Object.keys(chats);
+
+            if(ids.length){
+
+                abrirChat(ids[0]);
+
+            }else{
+
+                novaConversa();
+
+            }
+        }
+    );
+
+    item.appendChild(nome);
+    item.appendChild(removeBtn);
 
     item.addEventListener(
         "click",
-        ()=>{
-
-            abrirChat(id);
-
-        }
+        ()=> abrirChat(id)
     );
 
     item.addEventListener(
@@ -170,17 +213,15 @@ function criarItemChat(id){
             chats[id].nome =
             novoNome;
 
-            item.textContent =
+            nome.textContent =
             novoNome;
 
             salvar();
-
         }
     );
 
     chatList.appendChild(item);
 }
-
 /* =========================
    NOVA CONVERSA
 ========================= */
