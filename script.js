@@ -136,8 +136,11 @@ function criarItemChat(id){
     const item =
     document.createElement("div");
 
-    item.className = "chat-item";
-    item.dataset.id = id;
+    item.className =
+    "chat-item";
+
+    item.dataset.id =
+    id;
 
     const nome =
     document.createElement("span");
@@ -160,41 +163,53 @@ function criarItemChat(id){
 
             e.stopPropagation();
 
-            if(
-                !confirm(
-                    "Remover esta conversa?"
-                )
-            ){
+            const confirmar =
+            confirm(
+                "Remover esta conversa?"
+            );
+
+            if(!confirmar)
                 return;
-            }
 
             delete chats[id];
 
             item.remove();
 
-            salvar();
+            if(chatAtual === id){
 
-            const ids =
-            Object.keys(chats);
+                chat.innerHTML = "";
 
-            if(ids.length){
+                const ids =
+                Object.keys(chats);
 
-                abrirChat(ids[0]);
+                if(ids.length){
 
-            }else{
+                    abrirChat(ids[0]);
 
-                novaConversa();
+                }else{
 
+                    novaConversa();
+
+                }
             }
+
+            salvar();
         }
     );
 
     item.appendChild(nome);
-    item.appendChild(removeBtn);
+
+    item.appendChild(
+        removeBtn
+    );
 
     item.addEventListener(
         "click",
-        ()=> abrirChat(id)
+        ()=>{
+
+            abrirChat(id);
+
+        }
     );
 
     item.addEventListener(
