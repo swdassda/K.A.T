@@ -365,6 +365,8 @@ imageInput.addEventListener(
 
 async function enviar(){
 
+    const chatIdEnvio = chatAtual;
+
     const msg =
     messageInput.value.trim();
 
@@ -380,7 +382,7 @@ async function enviar(){
         "user"
     );
 
-    chats[chatAtual]
+    chats[chatIdEnvio]
     .mensagens
     .push({
         texto:
@@ -393,10 +395,12 @@ async function enviar(){
     messageInput.value = "";
 
     const resposta =
-    criarBolha(
+    chatAtual === chatIdEnvio
+    ? criarBolha(
         "● ● ●",
         "bot loading"
-    );
+    )
+    : null;
 
     try{
 
@@ -421,7 +425,7 @@ async function enviar(){
 
                     player:"player1",
                    
-                    chat_id:chatAtual
+                    chat_id:chatIdEnvio
 
                    
 
@@ -431,12 +435,15 @@ async function enviar(){
 
         if(!response.ok){
 
-            resposta.textContent =
-            "Erro ao conectar.";
+            if(resposta){
+                resposta.textContent =
+                "Erro ao conectar.";
 
-            resposta.classList
-            .remove("loading");
-
+                resposta.classList.remove(
+                    "loading"
+                );
+            }
+            
             return;
         }
 
@@ -465,13 +472,16 @@ async function enviar(){
 
             if(!iniciou){
 
-                resposta.textContent =
-                "";
+                if(resposta){
 
-                resposta.classList
-                .remove(
-                    "loading"
-                );
+                    resposta.textContent =
+                    "";
+
+                    resposta.classList
+                    .remove(
+                        "loading"
+                    );
+                }
 
                 iniciou = true;
             }
@@ -484,21 +494,24 @@ async function enviar(){
             textoFinal +=
             chunk;
 
-            resposta.textContent =
-            textoFinal;
+            if(
+                resposta &&
+                chatAtual === chatIdEnvio
+            ){
+                resposta.textContent =
+                textoFinal;
+            }
 
-            scrollFinal();
+            if(chatAtual === chatIdEnvio){
+                scrollFinal();
+            }
         }
 
-        chats[chatAtual]
+        chats[chatIdEnvio]
         .mensagens
         .push({
-
-            texto:
-            textoFinal,
-
+            texto:textoFinal,
             tipo:"bot"
-
         });
 
         salvar();
@@ -506,17 +519,18 @@ async function enviar(){
     }
     catch(error){
 
-        console.error(
-            error
-        );
+        console.error(error);
 
-        resposta.textContent =
-        "Erro ao processar resposta.";
+        if(resposta){
 
-        resposta.classList
-        .remove(
-            "loading"
-        );
+            resposta.textContent =
+            "Erro ao processar resposta.";
+
+            resposta.classList
+            .remove("loading");
+        }
+
+
     }
 
     imagemBase64 = null;
