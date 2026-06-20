@@ -1,39 +1,99 @@
 const chat = document.getElementById("chat");
+const chatList = document.getElementById("chatList");
+
 const sendBtn = document.getElementById("send");
 const messageInput = document.getElementById("message");
 const imageInput = document.getElementById("imageInput");
-const typing = document.getElementById("typing");
 
+const newChatBtn = document.getElementById("newChat");
+
+const usernameElement =
+document.getElementById("username");
+
+const editUser =
+document.getElementById("editUser");
+
+const API_URL =
+"https://ee13-2804-2484-991b-3400-8bdc-cb27-2b5f-a1e3.ngrok-free.app/ia";
+
+let chats = {};
+let chatAtual = null;
 let imagemBase64 = null;
 
-imageInput.addEventListener("change", e => {
+/* =========================
+   USUÁRIO
+========================= */
 
-    const file = e.target.files[0];
+let username =
+localStorage.getItem("username")
+|| "Usuário";
 
-    if(!file) return;
+usernameElement.textContent =
+username;
 
-    const reader = new FileReader();
+editUser.addEventListener("click", ()=>{
 
-    reader.onload = () => {
+    const novo =
+    prompt(
+        "Digite seu nome:",
+        username
+    );
 
-        imagemBase64 = reader.result.split(",")[1];
+    if(!novo) return;
 
-        criarBolha(
-            "📷 Imagem anexada",
-            "user"
-        );
-    };
+    username = novo;
 
-    reader.readAsDataURL(file);
+    usernameElement.textContent =
+    novo;
+
+    localStorage.setItem(
+        "username",
+        novo
+    );
+
 });
 
-function criarBolha(texto, tipo){
+/* =========================
+   SALVAR
+========================= */
 
-    const div = document.createElement("div");
+function salvar(){
 
-    div.className = `bubble ${tipo}`;
+    localStorage.setItem(
+        "kathyChats",
+        JSON.stringify(chats)
+    );
 
-    div.textContent = texto;
+}
+
+/* =========================
+   SCROLL
+========================= */
+
+function scrollFinal(){
+
+    chat.scrollTop =
+    chat.scrollHeight;
+
+}
+
+/* =========================
+   BOLHAS
+========================= */
+
+function criarBolha(
+    texto,
+    tipo
+){
+
+    const div =
+    document.createElement("div");
+
+    div.className =
+    `bubble ${tipo}`;
+
+    div.textContent =
+    texto;
 
     chat.appendChild(div);
 
@@ -42,71 +102,397 @@ function criarBolha(texto, tipo){
     return div;
 }
 
-function scrollFinal(){
+/* =========================
+   SIDEBAR
+========================= */
 
-    chat.scrollTop = chat.scrollHeight;
+function atualizarSidebarAtiva(){
+
+    document
+    .querySelectorAll(".chat-item")
+    .forEach(item=>{
+
+        item.classList.remove(
+            "active"
+        );
+
+        if(
+            item.dataset.id ===
+            chatAtual
+        ){
+
+            item.classList.add(
+                "active"
+            );
+
+        }
+
+    });
+
 }
 
-async function enviar(){
+function criarItemChat(id){
 
-    const msg = messageInput.value.trim();
+    const item =
+    document.createElement("div");
 
-    if(!msg && !imagemBase64)
-        return;
+    item.className =
+    "chat-item";
 
-    criarBolha(msg || "[imagem]", "user");
+    item.dataset.id =
+    id;
 
-    messageInput.value = "";
+    item.textContent =
+    chats[id].nome;
 
-    typing.hidden = false;
+    item.addEventListener(
+        "click",
+        ()=>{
 
-    const resposta = criarBolha("", "bot");
+            abrirChat(id);
 
-    const response = await fetch(
-        "https://ee13-2804-2484-991b-3400-8bdc-cb27-2b5f-a1e3.ngrok-free.app/ia",
-        {
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify({
-                message:msg,
-                image:imagemBase64,
-                internet:true,
-                player:"player1"
-            })
         }
     );
 
-    typing.hidden = true;
+    item.addEventListener(
+        "dblclick",
+        ()=>{
 
-    const reader = response.body.getReader();
+            const novoNome =
+            prompt(
+                "Novo nome da conversa:",
+                chats[id].nome
+            );
 
-    const decoder = new TextDecoder();
+            if(!novoNome)
+                return;
 
-    while(true){
+            chats[id].nome =
+            novoNome;
 
-        const {done,value} =
+            item.textContent =
+            novoNome;
+
+            salvar();
+
+        }
+    );
+
+    chatList.appendChild(item);
+}
+
+/* =========================
+   NOVA CONVERSA
+========================= */
+
+function novaConversa(){
+
+    const id =
+    "chat_" + Date.now();
+
+    chats[id] = {
+
+        nome:
+        "Nova conversa",
+
+        mensagens:[]
+    };
+
+    criarItemChat(id);
+
+    abrirChat(id);
+
+    salvar();
+}
+
+/* =========================
+   ABRIR CHAT
+========================= */
+
+function abrirChat(id){
+
+    chatAtual = id;
+
+    chat.innerHTML = "";
+
+    chats[id]
+    .mensagens
+    .forEach(msg=>{
+
+        criarBolha(
+            msg.texto,
+            msg.tipo
+        );
+
+    });
+
+    atualizarSidebarAtiva();
+}
+
+/* =========================
+   CARREGAR HISTÓRICO
+========================= */
+
+function carregarChats(){
+
+    const dados =
+    localStorage.getItem(
+        "kathyChats"
+    );
+
+    if(!dados){
+
+        novaConversa();
+
+        return;
+    }
+
+    chats =
+    JSON.parse(dados);
+
+    chatList.innerHTML = "";
+
+    Object.keys(chats)
+    .forEach(id=>{
+
+        criarItemChat(id);
+
+    });
+
+    const primeiro =
+    Object.keys(chats)[0];
+
+    abrirChat(primeiro);
+}
+
+/* =========================
+   IMAGEM
+========================= */
+
+imageInput.addEventListener(
+    "change",
+    e=>{
+
+        const file =
+        e.target.files[0];
+
+        if(!file)
+            return;
+
+        const reader =
+        new FileReader();
+
+        reader.onload =
+        ()=>{
+
+            imagemBase64 =
+            reader.result
+            .split(",")[1];
+
+            criarBolha(
+                "📷 Imagem anexada",
+                "user"
+            );
+
+        };
+
+        reader.readAsDataURL(
+            file
+        );
+
+    }
+);
+
+/* =========================
+   ENVIO
+========================= */
+
+async function enviar(){
+
+    const msg =
+    messageInput.value.trim();
+
+    if(
+        !msg &&
+        !imagemBase64
+    ){
+        return;
+    }
+
+    criarBolha(
+        msg || "[imagem]",
+        "user"
+    );
+
+    chats[chatAtual]
+    .mensagens
+    .push({
+        texto:
+        msg || "[imagem]",
+        tipo:"user"
+    });
+
+    salvar();
+
+    messageInput.value = "";
+
+    const resposta =
+    criarBolha(
+        "● ● ●",
+        "bot loading"
+    );
+
+    try{
+
+        const response =
+        await fetch(
+            API_URL,
+            {
+                method:"POST",
+
+                headers:{
+                    "Content-Type":
+                    "application/json"
+                },
+
+                body:JSON.stringify({
+
+                    message:msg,
+
+                    image:imagemBase64,
+
+                    internet:true,
+
+                    player:"player1"
+
+                })
+            }
+        );
+
+        if(!response.ok){
+
+            resposta.textContent =
+            "Erro ao conectar.";
+
+            resposta.classList
+            .remove("loading");
+
+            return;
+        }
+
+        const reader =
+        response.body.getReader();
+
+        const decoder =
+        new TextDecoder();
+
+        let iniciou =
+        false;
+
+        let textoFinal =
+        "";
+
+        while(true){
+
+            const {
+                done,
+                value
+            } =
             await reader.read();
 
-        if(done)
-            break;
+            if(done)
+                break;
 
-        resposta.textContent +=
-            decoder.decode(value);
+            if(!iniciou){
 
-        scrollFinal();
+                resposta.textContent =
+                "";
+
+                resposta.classList
+                .remove(
+                    "loading"
+                );
+
+                iniciou = true;
+            }
+
+            const chunk =
+            decoder.decode(
+                value
+            );
+
+            textoFinal +=
+            chunk;
+
+            resposta.textContent =
+            textoFinal;
+
+            scrollFinal();
+        }
+
+        chats[chatAtual]
+        .mensagens
+        .push({
+
+            texto:
+            textoFinal,
+
+            tipo:"bot"
+
+        });
+
+        salvar();
+
+    }
+    catch(error){
+
+        console.error(
+            error
+        );
+
+        resposta.textContent =
+        "Erro ao processar resposta.";
+
+        resposta.classList
+        .remove(
+            "loading"
+        );
     }
 
     imagemBase64 = null;
 }
 
-sendBtn.addEventListener("click", enviar);
+/* =========================
+   EVENTOS
+========================= */
+
+sendBtn.addEventListener(
+    "click",
+    enviar
+);
 
 messageInput.addEventListener(
     "keypress",
     e=>{
-        if(e.key==="Enter")
+
+        if(
+            e.key === "Enter"
+        ){
+
             enviar();
+
+        }
+
     }
 );
+
+newChatBtn.addEventListener(
+    "click",
+    novaConversa
+);
+
+/* =========================
+   START
+========================= */
+
+carregarChats();
